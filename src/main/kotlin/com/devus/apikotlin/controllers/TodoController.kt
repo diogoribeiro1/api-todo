@@ -2,6 +2,7 @@ package com.devus.apikotlin.controllers
 
 import com.devus.apikotlin.entities.Todo
 import com.devus.apikotlin.repositories.TodoRepository
+import com.devus.apikotlin.services.TodoService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
+import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.bind.annotation.RestController
 import java.util.Objects
 import java.util.Optional
@@ -23,35 +25,33 @@ import java.util.Optional
 class TodoController {
 
     @Autowired
-    lateinit var repository: TodoRepository;
+    lateinit var service: TodoService;
 
     @GetMapping
-    fun getAll(): List<Todo>{
-        return repository.findAll();
+    @ResponseBody
+    fun getAll(): ResponseEntity<List<Todo>>{
+        return service.getAll();
     }
 
     @PostMapping
-    fun create(@RequestBody todo: Todo): Todo{
-        return repository.save(todo);
+    @ResponseBody
+    fun create(@RequestBody todo: Todo): ResponseEntity<Todo>{
+        return service.create(todo);
     }
 
     @GetMapping("/{id}")
-    fun getOne(@PathVariable id: Long): Optional<Todo>{
-        return repository.findById(id);
+    @ResponseBody
+    fun getOne(@PathVariable id: Long): ResponseEntity<Any>{
+        return service.getOneById(id);
     }
 
     @PutMapping("/{id}")
     fun update(@PathVariable id: Long, @RequestBody todo: Todo): ResponseEntity<Todo>{
-        var todoPayload = repository.findById(id).get()
-        todoPayload.title = todo.title
-        todoPayload.description = todo.description
-        todoPayload = repository.save(todoPayload)
-        return ResponseEntity.status(HttpStatus.CREATED).body(todoPayload);
+        return service.update(id,todo);
     }
 
     @DeleteMapping("/{id}")
-    fun deleteById(@PathVariable id: Long): ResponseEntity<Objects>{
-        var todoPayload = repository.deleteById(id)
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    fun deleteById(@PathVariable id: Long): ResponseEntity<Any>{
+        return service.delete(id);
     }
 }
