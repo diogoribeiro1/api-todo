@@ -14,32 +14,30 @@ class TodoService {
     @Autowired
     lateinit var repository: TodoRepository;
 
-    fun create(todo: Todo): ResponseEntity<Todo>{
-       var payload = repository.save(todo);
-       return ResponseEntity.status(201).body(payload);
+    fun create(todo: Todo): Todo{
+        return repository.save(todo);
     }
 
-    fun getAll(): ResponseEntity<List<Todo>>{
-        var payload = repository.findAll();
-        return ResponseEntity.status(200).body(payload);
+    fun getAll(): List<Todo>{
+        return repository.findAll();
     }
 
-    fun getOneById(id: Long): ResponseEntity<Any>{
+    fun getOneById(id: Long): Any{
         var payload = if (repository.findById(id).isEmpty()) "Todo not found" else repository.findById(id).get() ;
-        return ResponseEntity.status(200).body(payload);
+        return payload;
     }
 
-    fun update(id: Long, todo: Todo): ResponseEntity<Todo>{
-        var todoPayload = repository.findById(id).get()
+    fun update(id: Long, todo: Todo): Todo{
+        var todoPayload = repository.findById(id).orElseThrow();
         todoPayload.title = todo.title
         todoPayload.description = todo.description
         todoPayload = repository.save(todoPayload)
-        return ResponseEntity.ok(todoPayload);
+        return todoPayload;
     }
 
-    fun delete(id: Long): ResponseEntity<Any>{
-        var payload = if (repository.findById(id).isEmpty()) "Todo not found" else repository.deleteById(id);
-        return ResponseEntity.noContent().build();
+    fun delete(id: Long){
+       repository.findById(id).orElseThrow();
+       repository.deleteById(id);
     }
 
 }

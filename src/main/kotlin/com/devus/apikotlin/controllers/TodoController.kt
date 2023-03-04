@@ -30,28 +30,43 @@ class TodoController {
     @GetMapping
     @ResponseBody
     fun getAll(): ResponseEntity<List<Todo>>{
-        return service.getAll();
+        var payload = service.getAll();
+        return ResponseEntity(payload, HttpStatus.OK);
     }
 
     @PostMapping
     @ResponseBody
     fun create(@RequestBody todo: Todo): ResponseEntity<Todo>{
-        return service.create(todo);
+        var payload = service.create(todo);
+        return ResponseEntity(payload, HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
     @ResponseBody
     fun getOne(@PathVariable id: Long): ResponseEntity<Any>{
-        return service.getOneById(id);
+       var payload = service.getOneById(id);
+        return  if (payload == "Todo not found")
+            ResponseEntity(payload, HttpStatus.NOT_FOUND)
+        else ResponseEntity(payload, HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
-    fun update(@PathVariable id: Long, @RequestBody todo: Todo): ResponseEntity<Todo>{
-        return service.update(id,todo);
+    fun update(@PathVariable id: Long, @RequestBody todo: Todo): ResponseEntity<Any> {
+        try {
+            var payload = service.update(id,todo);
+            return ResponseEntity(payload, HttpStatus.OK);
+        }catch (e: Exception){
+            return ResponseEntity("Todo not found", HttpStatus.NOT_FOUND);
+        }
     }
 
     @DeleteMapping("/{id}")
     fun deleteById(@PathVariable id: Long): ResponseEntity<Any>{
-        return service.delete(id);
+        try {
+            service.delete(id);
+            return ResponseEntity(HttpStatus.NO_CONTENT);
+        }catch (e: Exception){
+            return ResponseEntity("Todo not found", HttpStatus.NOT_FOUND);
+        }
     }
 }
