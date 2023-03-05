@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull
 
 @Entity
 @Table(name = "todos")
-class Todo (
+class Task (
 
     @field:Id
     @field:GeneratedValue(strategy = GenerationType.AUTO)
